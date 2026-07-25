@@ -76,7 +76,7 @@
                             </div>
 
                             <!-- Photo -->
-                            <div class="mb-3">
+                            <div class="col-md-2 mb-3">
                                 <div id="photo-upload" class="dashed-border rounded d-flex align-items-center justify-content-center position-relative" style="width: 130px; height: 154px; border: 2px dashed #999; cursor: pointer; overflow: hidden;">
                                     <!-- Jab upload nahi ho raha ho -->
                                     <div wire:loading.remove wire:target="photo" style="text-align:center;">
@@ -121,8 +121,8 @@
                                 @error('addressField.state') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
                             
-                            <!-- City Dropdown -->
-                            <div class="col-md-4">
+                            <!-- City Dropdown (issue with live deployment in fetching cities)-->
+                            {{-- <div class="col-md-4">
                                 <label for="city" class="form-label">City</label>
                                 <select class="form-control border-bottom" id="city" name="addressField[city]" wire:model.live="selectedCity">
                                     <option value="">Select City</option>
@@ -131,6 +131,22 @@
                                     @endforeach
                                 </select>
                                 @error('addressField.city') <div class="text-danger small">{{ $message }}</div> @enderror
+                            </div> --}}
+
+                            <!-- City Text Input -->
+                            <div class="col-md-4">
+                                <label for="city" class="form-label">City</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control border-bottom" 
+                                    id="city" 
+                                    name="addressField[city]" 
+                                    wire:model.live="selectedCity" 
+                                    placeholder="Enter your city name"
+                                >
+                                @error('addressField.city') 
+                                    <div class="text-danger small">{{ $message }}</div> 
+                                @enderror
                             </div>
                             
                             <!-- Pincode Input -->

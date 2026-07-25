@@ -150,7 +150,7 @@ class StudentRegistration extends Component
         $this->calculateTotal();
         $this->paymentMethod = '';
 
-        //$this->fetchStates();
+        $this->fetchStates();
         //$this->selectedState;
 
     }
@@ -229,9 +229,9 @@ class StudentRegistration extends Component
         //$this->selectedCity = '';
         
         $this->addressField['state'] = $this->selectedState;
-        $this->fetchCities();
-        $this->selectedCity = '';
-        $this->addressField['city'] = '';
+        //$this->fetchCities();
+        //$this->selectedCity = '';
+        //$this->addressField['city'] = '';
     }
 
     
