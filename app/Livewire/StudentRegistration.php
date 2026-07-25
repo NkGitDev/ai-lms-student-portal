@@ -150,7 +150,7 @@ class StudentRegistration extends Component
         $this->calculateTotal();
         $this->paymentMethod = '';
 
-        $this->fetchStates();
+        //$this->fetchStates();
         //$this->selectedState;
 
     }
