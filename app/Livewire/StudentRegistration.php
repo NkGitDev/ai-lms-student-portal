@@ -150,36 +150,40 @@ class StudentRegistration extends Component
         $this->calculateTotal();
         $this->paymentMethod = '';
 
-        //$this->fetchStates();
+        $this->fetchStates();
         //$this->selectedState;
 
     }
     
     
     public function fetchStates()
-    {
-        //dd('fetchStates function is working');
-
-        // JSON file ka path
+{
+    try {
         $jsonPath = public_path('data/countries+states+cities.json');
 
-        // File se content read karo
-        $jsonContent = file_get_contents($jsonPath);
+        // 1. Safe check: File hai ya nahi
+        if (!file_exists($jsonPath)) {
+            \Log::error('States JSON file not found at: ' . $jsonPath);
+            $this->states = [];
+            return;
+        }
 
-        // JSON decode karo
+        $jsonContent = file_get_contents($jsonPath);
         $data = json_decode($jsonContent, true);
 
-        // India ke data ko dhundhna
-        $india = collect($data)->firstWhere('name', 'India'); 
+        // 2. India ke states nikalna (Aapka original logic)
+        $india = collect($data)->firstWhere('name', 'India');
 
         if ($india && isset($india['states'])) {
             $this->states = $india['states'];
-            // Optional: debug ke liye
-            // dd($this->states);
         } else {
             $this->states = [];
         }
+    } catch (\Exception $e) {
+        \Log::error('Fetch States Error: ' . $e->getMessage());
+        $this->states = [];
     }
+}
 
     public function fetchCities()
     {
