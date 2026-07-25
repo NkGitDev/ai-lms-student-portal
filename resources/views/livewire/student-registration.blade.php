@@ -142,21 +142,22 @@
                                 @error('addressField.city') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div> --}}
 
-                            <!-- City Text Input -->
-                            <div class="col-md-4">
-                                <label for="city" class="form-label">City</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control border-bottom" 
-                                    id="city" 
-                                    name="addressField[city]" 
-                                    wire:model.live="selectedCity" 
-                                    placeholder="Enter your city name"
-                                >
-                                @error('addressField.city') 
-                                    <div class="text-danger small">{{ $message }}</div> 
-                                @enderror
-                            </div>
+                            <!-- City Dropdown -->
+<div class="col-md-4">
+    <label for="city" class="form-label">City</label>
+    <select class="form-control border-bottom" id="city" wire:model.live="selectedCity" {{ empty($cities) ? 'disabled' : '' }}>
+        <option value="">{{ empty($cities) ? 'Select State First' : 'Select City' }}</option>
+        @if(!empty($cities))
+            @foreach($cities as $city)
+                <option value="{{ $city }}">{{ $city }}</option>
+            @endforeach
+        @endif
+    </select>
+
+    {{-- Validation errors --}}
+    @error('selectedCity') <div class="text-danger small">{{ $message }}</div> @enderror
+    @error('addressField.city') <div class="text-danger small">{{ $message }}</div> @enderror
+</div>
                             
                             <!-- Pincode Input -->
                             <div class="col-md-4">

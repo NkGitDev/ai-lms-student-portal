@@ -232,11 +232,11 @@ public function fetchCities()
 }
 
     
-    public function updatedSelectedCity()
-    {
-        $this->addressField['city'] = $this->selectedCity;
-    }
-
+  // Jab user city select kare tab yeh run hoga
+public function updatedSelectedCity($value)
+{
+    $this->addressField['city'] = $value;
+}
 
     
     public function updatedCourse()
