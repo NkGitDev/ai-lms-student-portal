@@ -8,6 +8,8 @@ use Livewire\WithFileUploads;
 use App\Models\Student;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 
 class StudentRegistration extends Component
@@ -159,84 +161,75 @@ class StudentRegistration extends Component
     public function fetchStates()
 {
     try {
-        $jsonPath = public_path('data/countries+states+cities.json');
+        // Cache API response for 24 hours (86400 seconds)
+        // Isse page load fast hoga aur 500 error nahi aayega
+        $this->states = Cache::remember('india_states', 86400, function () {
+            
+            // Free API for States
+            $response = Http::timeout(10)->post('https://countriesnow.space/api/v0.1/countries/states', [
+                'country' => 'India'
+            ]);
 
-        // 1. Safe check: File hai ya nahi
-        if (!file_exists($jsonPath)) {
-            \Log::error('States JSON file not found at: ' . $jsonPath);
-            $this->states = [];
-            return;
-        }
+            if ($response->successful()) {
+                $data = $response->json();
+                return $data['data']['states'] ?? [];
+            }
+            
+            return [];
+        });
 
-        $jsonContent = file_get_contents($jsonPath);
-        $data = json_decode($jsonContent, true);
-
-        // 2. India ke states nikalna (Aapka original logic)
-        $india = collect($data)->firstWhere('name', 'India');
-
-        if ($india && isset($india['states'])) {
-            $this->states = $india['states'];
-        } else {
-            $this->states = [];
-        }
     } catch (\Exception $e) {
-        \Log::error('Fetch States Error: ' . $e->getMessage());
+        \Log::error('API Fetch States Error: ' . $e->getMessage());
         $this->states = [];
     }
 }
 
-    public function fetchCities()
-    {
-        //dd('fetchCity Function is working');
-        try {
-            if (!$this->selectedState) {
-                $this->cities = [];
-                return;
-            }
-
-            $jsonPath = public_path('data/countries+states+cities.json');
-            $jsonContent = file_get_contents($jsonPath);
-            $data = json_decode($jsonContent, true);
-            //dd('fetchCity data : ', $data);
-
-             \Log::info('Data loaded: ', $data);
-            // India ke data ko dhundhna
-            $india = collect($data)->firstWhere('name', 'India');
-
-            if ($india && isset($india['states'])) {
-                $state = collect($india['states'])->firstWhere('name', $this->selectedState);
-                
-                if ($state && isset($state['cities'])) {
-                    $this->cities = $state['cities'];
-                    //dd($this->cities);
-                    \Log::info('Cities: ', $this->cities);
-                } else {
-                    $this->cities = [];
-                }
-            } else {
-                $this->cities = [];
-            }
-        } catch (\Exception $e) {
-            // Exception ko log karen
-            \Log::error('Fetch Cities Error: ' . $e->getMessage());
+public function fetchCities()
+{
+    try {
+        if (!$this->selectedState) {
             $this->cities = [];
-            // Optional: error message show karen
-            session()->flash('error', 'Error fetching cities.');
+            return;
         }
+
+        // Har state ki cities alag cache hongi
+        $cacheKey = 'cities_' . Str::slug($this->selectedState);
+
+        $this->cities = Cache::remember($cacheKey, 86400, function () {
+            
+            // Free API for Cities
+            $response = Http::timeout(10)->post('https://countriesnow.space/api/v0.1/countries/state/cities', [
+                'country' => 'India',
+                'state' => $this->selectedState
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return $data['data'] ?? [];
+            }
+            
+            return [];
+        });
+
+    } catch (\Exception $e) {
+        \Log::error('API Fetch Cities Error: ' . $e->getMessage());
+        $this->cities = [];
     }
+}
     
     
-    public function updatedSelectedState()
-    {
-        
-        //$this->fetchCities();
-        //$this->selectedCity = '';
-        
-        $this->addressField['state'] = $this->selectedState;
-        //$this->fetchCities();
-        //$this->selectedCity = '';
-        //$this->addressField['city'] = '';
-    }
+    public function updatedSelectedState($value)
+{
+    // 1. Sync state value to address array
+    $this->addressField['state'] = $value;
+
+    // 2. Clear previous city selections
+    $this->selectedCity = '';
+    $this->addressField['city'] = '';
+
+    // 3. Fetch cities for the newly selected state via API
+    $this->fetchCities();
+}
 
     
     public function updatedSelectedCity()

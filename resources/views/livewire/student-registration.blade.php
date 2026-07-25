@@ -110,16 +110,25 @@
                         <!-- Address Fields -->
                         <div class="row mb-3">
                             <!-- State Dropdown -->
-                            <div class="col-md-4">
-                                <label for="state" class="form-label">State</label>
-                                <select class="form-control border-bottom" id="state" name="addressField[state]" wire:model.live="selectedState">
-                                    <option value="">Select State</option>
-                                    @foreach($states as $state)
-                                        <option value="{{ $state['name'] ?? $state }}">{{ $state['name'] ?? $state }}</option>
-                                    @endforeach
-                                </select>
-                                @error('addressField.state') <div class="text-danger small">{{ $message }}</div> @enderror
-                            </div>
+<div class="col-md-4">
+    <label for="state" class="form-label">State</label>
+    <select class="form-control border-bottom" id="state" wire:model.live="selectedState">
+        <option value="">Select State</option>
+        @if(!empty($states))
+            @foreach($states as $state)
+                @php 
+                    // API array structure safe handling
+                    $stateName = is_array($state) ? ($state['name'] ?? '') : $state;
+                @endphp
+                <option value="{{ $stateName }}">{{ $stateName }}</option>
+            @endforeach
+        @endif
+    </select>
+    
+    {{-- Validation errors --}}
+    @error('selectedState') <div class="text-danger small">{{ $message }}</div> @enderror
+    @error('addressField.state') <div class="text-danger small">{{ $message }}</div> @enderror
+</div>
                             
                             <!-- City Dropdown (issue with live deployment in fetching cities)-->
                             {{-- <div class="col-md-4">
