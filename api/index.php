@@ -10,5 +10,5 @@ try {
     echo "<p><strong>Message:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     echo "<p><strong>File:</strong> " . htmlspecialchars($e->getFile()) . " on line " . $e->getLine() . "</p>";
     echo "<h3>Stack Trace:</h3>";
-    echo "<pre> " . htmlspecialchars($e->getTraceAsString()) . " </pre>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
 }
