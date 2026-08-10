@@ -17,10 +17,6 @@
       "dest": "/assets/$1"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
