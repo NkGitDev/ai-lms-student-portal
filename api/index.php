@@ -1,2 +1,4 @@
 <?php
-echo "Vercel PHP is working perfectly!";
+
+// Forward Vercel requests to Laravel's public index
+require __DIR__ . '/../public/index.php';
